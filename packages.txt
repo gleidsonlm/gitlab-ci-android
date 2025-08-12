@@ -27,8 +27,9 @@ extras;google;m2repository
 extras;google;google_play_services
 
 # Constraint Layout Support - Modern layout system
-# Note: This specific version maintains compatibility with legacy projects
-extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2
+# Note: Constraint Layout is now part of AndroidX and should be added as a Gradle dependency
+# in your app's build.gradle file: implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+# The old Android Support Library constraint-layout packages have been deprecated
 
 # =============================================================================
 # ANDROID NDK (NATIVE DEVELOPMENT KIT) - Phase 3 Integration

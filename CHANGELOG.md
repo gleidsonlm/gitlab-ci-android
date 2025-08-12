@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2025-08-12 - Docker Build Fix and Resilience Improvements
+
+### Fixed
+- **Docker Build Failure** - Resolved constraint-layout package installation error that was causing build failures at step 9/15
+- **Obsolete Package Removal** - Removed deprecated `extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2` package
+- **Build Resilience** - Added error handling to make builds more resilient to network connectivity issues during SDK package installation
+- **Gradle Installation** - Fixed Gradle directory structure to ensure proper PATH configuration
+- **NDK Installation** - Made NDK package installation optional with graceful fallback when network issues occur
+
+### Changed
+- **Constraint Layout Approach** - Constraint Layout is now handled as a Gradle dependency rather than an SDK package (AndroidX migration)
+- **Error Handling** - SDK package installation now continues with warnings instead of failing completely on network issues
+- **Build Process** - More robust build process that can handle temporary network connectivity issues
+
+### Added
+- **Documentation Updates** - Added guidance on using constraint-layout as a Gradle dependency in README.md
+- **Network Resilience** - Build can now complete successfully even if some non-critical packages fail to download
+- **Improved Error Messages** - Better error reporting and fallback mechanisms for network-related issues
+
+### Migration Guide
+- If using constraint-layout, add it as a Gradle dependency: `implementation 'androidx.constraintlayout:constraintlayout:2.1.4'`
+- No other changes required - existing CI configurations will continue to work
+- Build process is now more resilient to network issues in CI environments
+
 ## [3.0.0] - Phase 6: Docker Registry Publishing & Project Independence
 
 ### Added
