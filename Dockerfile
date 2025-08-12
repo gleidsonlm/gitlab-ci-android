@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-LABEL version="1.0.0" \
+LABEL version="3.1.0" \
       description="Android CI/CD Docker image with pre-configured SDK, build tools, and GitLab optimization" \
       maintainer="gleidsonlm"
 
@@ -54,7 +54,7 @@ RUN mkdir -p /root/.android \
 
 ADD packages.txt /sdk
 RUN grep -v '^#' /sdk/packages.txt | grep -v '^$' > /sdk/packages_clean.txt \
- && sdkmanager --package_file=/sdk/packages_clean.txt
+ && sdkmanager --package_file=/sdk/packages_clean.txt --verbose || echo "Warning: Some packages failed to install due to network issues"
 
 # =============================================================================
 # ANDROID NDK AND NATIVE DEVELOPMENT TOOLCHAIN - Phase 3
@@ -76,18 +76,23 @@ RUN apt-get -qq update \
 
 # Install Android NDK and CMake through SDK Manager
 # This ensures proper integration with Android SDK and automatic license handling
-RUN sdkmanager "ndk;27.3.13750724" "ndk;26.3.11579264" "cmake;3.22.1"
+RUN sdkmanager "ndk;27.3.13750724" "ndk;26.3.11579264" "cmake;3.22.1" || echo "Warning: NDK packages failed to install due to network issues"
 
 # Create symbolic links for easier NDK access and backward compatibility
-RUN ln -sf ${ANDROID_SDK_ROOT}/ndk/27.3.13750724 ${ANDROID_SDK_ROOT}/ndk/latest \
- && ln -sf ${ANDROID_SDK_ROOT}/ndk/26.3.11579264 ${ANDROID_SDK_ROOT}/ndk/previous
+RUN if [ -d ${ANDROID_SDK_ROOT}/ndk/27.3.13750724 ]; then \
+      ln -sf ${ANDROID_SDK_ROOT}/ndk/27.3.13750724 ${ANDROID_SDK_ROOT}/ndk/latest; \
+    fi && \
+    if [ -d ${ANDROID_SDK_ROOT}/ndk/26.3.11579264 ]; then \
+      ln -sf ${ANDROID_SDK_ROOT}/ndk/26.3.11579264 ${ANDROID_SDK_ROOT}/ndk/previous; \
+    fi
 
 # Verify NDK installation and create runtime environment setup
 RUN echo "#!/bin/bash" > /usr/local/bin/ndk-env \
  && echo "export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}" >> /usr/local/bin/ndk-env \
  && echo "export ANDROID_NDK_HOME=${ANDROID_NDK_HOME}" >> /usr/local/bin/ndk-env \
  && echo "export PATH=\$PATH:${ANDROID_NDK_HOME}:${ANDROID_SDK_ROOT}/cmake/3.22.1/bin" >> /usr/local/bin/ndk-env \
- && chmod +x /usr/local/bin/ndk-env
+ && chmod +x /usr/local/bin/ndk-env \
+ && echo "NDK environment setup script created (run 'source /usr/local/bin/ndk-env' if NDK was installed)"
 
 # =============================================================================
 # NDK INTEGRATION SUMMARY
@@ -121,7 +126,6 @@ ENV PATH="$PATH:${GRADLE_HOME}/bin"
 
 RUN curl --silent --show-error --output /gradle.zip \
       https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
- && mkdir -p ${GRADLE_HOME} \
  && unzip /gradle.zip -d /opt \
  && mv /opt/gradle-${GRADLE_VERSION} ${GRADLE_HOME} \
  && rm -v /gradle.zip

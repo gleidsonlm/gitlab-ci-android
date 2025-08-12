@@ -2,6 +2,11 @@
 
 This Docker image contains the Android SDK and most common packages necessary for building Android apps in a CI tool like GitLab CI.
 
+**Note**: As of version 3.1.0, the constraint-layout library is no longer included as an SDK package since it has moved to AndroidX. Add constraint-layout as a Gradle dependency in your `app/build.gradle` file:
+```gradle
+implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+```
+
 Make sure your CI environment's caching works as expected, this greatly improves the build time, especially if you use multiple build jobs.
 
 ## Usage Examples
