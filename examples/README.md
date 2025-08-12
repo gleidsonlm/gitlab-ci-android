@@ -12,16 +12,32 @@ See [kotlin-test-project.md](kotlin-test-project.md) for a comprehensive Kotlin 
 - Build cache and parallel execution testing
 
 ### Gradle Integration Test
-Use the root-level `test-gradle-kotlin-integration.sh` script to verify:
-- Gradle installation and configuration
-- Environment variables setup
-- Global gradle.properties configuration
-- Performance feature availability
+Use the root-level test scripts to verify installation and functionality:
 
+#### Basic Integration Test
 ```bash
-# Run Gradle integration test
+# Test Gradle installation and configuration
 docker run --rm gitlab-ci-android:latest ./test-gradle-kotlin-integration.sh
 ```
+
+#### Installation Validation
+```bash
+# Validate Gradle download and installation process
+docker run --rm gitlab-ci-android:latest ./validate-gradle-installation.sh
+```
+
+#### Comprehensive Kotlin & Gradle Test
+```bash
+# Complete test with Kotlin project creation and build
+docker run --rm gitlab-ci-android:latest ./comprehensive-kotlin-gradle-test.sh
+```
+
+This comprehensive test creates a full Kotlin project and verifies:
+- Gradle 9.0.0 project initialization
+- Modern Kotlin features (data classes, sealed classes, lambdas)
+- Build performance optimizations
+- Incremental compilation
+- Build cache functionality
 
 ## Phase 3: Android NDK Support
 

@@ -305,6 +305,10 @@ apt-get update && apt-get install -y openjdk-17-jdk wget unzip &&
 wget -q https://services.gradle.org/distributions/gradle-9.0.0-bin.zip &&
 unzip -q gradle-9.0.0-bin.zip && ./gradle-9.0.0/bin/gradle --version
 "
+
+# Or run the comprehensive test scripts:
+./validate-gradle-installation.sh
+./comprehensive-kotlin-gradle-test.sh
 ```
 
 #### Common Solutions
