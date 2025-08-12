@@ -134,11 +134,23 @@ After making changes to the Dockerfile or build process:
 - "Unable to resolve host: archive.ubuntu.com" - Ubuntu package installation fails
 - "Unable to resolve host: services.gradle.org" - Gradle downloads fail
 - "Unable to resolve host: dl.google.com" - Android SDK downloads fail
+- "SSL certificate problem: self-signed certificate in certificate chain" - SSL validation fails
 
 **Solutions:**
 - Use corporate proxy settings if available
 - Build in environments with full internet access
 - Use pre-built images from Docker Hub when building locally fails
+- **For SSL certificate issues**: Mount custom CA certificates or configure proxy properly rather than disabling SSL verification
+
+**SSL Certificate Handling:**
+As of v1.0.0, all insecure SSL certificate bypasses have been removed for security. If building in a corporate environment with SSL interception:
+```bash
+# Option 1: Mount custom CA certificates
+docker build --build-arg http_proxy=http://proxy:port --build-arg https_proxy=https://proxy:port .
+
+# Option 2: Use pre-built image instead
+docker pull gleidsonlm/gitlab-ci-android:latest
+```
 
 ## Common Tasks
 

@@ -26,7 +26,6 @@ RUN apt-get -qq update \
       lib32z1 \
       unzip \
       locales \
-      wget \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN locale-gen en_US.UTF-8
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8"
@@ -34,7 +33,10 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8"
 RUN rm -f /etc/ssl/certs/java/cacerts; \
     /var/lib/dpkg/info/ca-certificates-java.postinst configure
 
-RUN wget --no-verbose --no-check-certificate --output-document=/cmdline-tools.zip \
+# Update CA certificates for proper SSL/TLS validation
+RUN update-ca-certificates
+
+RUN curl --silent --show-error --output /cmdline-tools.zip \
       https://dl.google.com/android/repository/commandlinetools-linux-${VERSION_TOOLS}_latest.zip \
  && mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools \
  && unzip /cmdline-tools.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools \
@@ -117,7 +119,7 @@ ENV GRADLE_VERSION="9.0.0"
 ENV GRADLE_HOME="/opt/gradle"
 ENV PATH="$PATH:${GRADLE_HOME}/bin"
 
-RUN wget --no-verbose --output-document=/gradle.zip \
+RUN curl --silent --show-error --output /gradle.zip \
       https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
  && mkdir -p ${GRADLE_HOME} \
  && unzip /gradle.zip -d /opt \
