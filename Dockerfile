@@ -1,13 +1,13 @@
-FROM ubuntu:20.04
-MAINTAINER Jan Grewe <jan@faked.org>
+FROM ubuntu:22.04
+LABEL maintainer="Jan Grewe <jan@faked.org>"
 
-ENV VERSION_TOOLS "8512546"
+ENV VERSION_TOOLS="11076708"
 
-ENV ANDROID_SDK_ROOT "/sdk"
+ENV ANDROID_SDK_ROOT="/sdk"
 # Keep alias for compatibility
-ENV ANDROID_HOME "${ANDROID_SDK_ROOT}"
-ENV PATH "$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools"
-ENV DEBIAN_FRONTEND noninteractive
+ENV ANDROID_HOME="${ANDROID_SDK_ROOT}"
+ENV PATH="$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools"
+ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get -qq update \
  && apt-get install -qqy --no-install-recommends \
@@ -15,17 +15,17 @@ RUN apt-get -qq update \
       curl \
       git-core \
       html2text \
-      openjdk-11-jdk \
+      openjdk-17-jdk \
       libc6-i386 \
       lib32stdc++6 \
-      lib32gcc1 \
+      lib32gcc-s1 \
       lib32ncurses6 \
       lib32z1 \
       unzip \
       locales \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN locale-gen en_US.UTF-8
-ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8"
 
 RUN rm -f /etc/ssl/certs/java/cacerts; \
     /var/lib/dpkg/info/ca-certificates-java.postinst configure
