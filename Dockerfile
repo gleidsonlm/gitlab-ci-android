@@ -1,5 +1,8 @@
 FROM ubuntu:22.04
-LABEL maintainer="Gleidson Lima <gleidsonlm@example.com>"
+
+LABEL version="1.0.0" \
+      description="Android CI/CD Docker image with pre-configured SDK, build tools, and GitLab optimization" \
+      maintainer="gleidsonlm"
 
 ENV VERSION_TOOLS="13114758"
 
