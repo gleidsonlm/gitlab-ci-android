@@ -30,6 +30,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace `dcr.faked.org/gitlab-ci/android` with `gleidsonlm/gitlab-ci-android` in GitLab CI files
 - Pull new image: `docker pull gleidsonlm/gitlab-ci-android:latest`
 
+## [2.4.0] - Phase 5: Testing & Validation
+
+### Added
+- **Comprehensive Android Project Test** - Complete integration test validating SDK, NDK, Gradle, and Kotlin
+- **Sample CI/CD Build Script** - Demonstrative script showing typical Android development workflows
+- **Junior Developer Documentation** - Step-by-step testing procedures and troubleshooting guides
+- **Reproducible Test Framework** - Clear, actionable test instructions for all skill levels
+- **Multi-API Testing** - Validation across Android API levels 32, 33, and 34
+- **Performance Validation** - Build cache, parallel execution, and optimization verification
+- **Native Development Testing** - NDK integration testing with modern C++17 features
+
+### Enhanced
+- **README.md** - Complete testing and validation procedures documentation
+- **examples/README.md** - Updated with Phase 5 testing information
+- **Test Coverage** - Comprehensive validation of all Docker image capabilities
+
+### Validation Features
+- **Environment Verification** - Automated validation of all installed tools
+- **Build Performance Testing** - Incremental builds and cache effectiveness validation
+- **CI/CD Integration Examples** - GitLab CI and GitHub Actions configuration samples
+- **Troubleshooting Documentation** - Common issues and solutions for junior developers
+- **Multi-NDK Testing** - Support for testing with different NDK versions
+
 ## [2.3.0] - Phase 4: Gradle and Kotlin Build Optimization
 
 ### Added
