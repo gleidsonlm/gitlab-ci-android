@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - Phase 6: Docker Registry Publishing & Project Independence
+
+### Added
+- **Docker Hub Publishing** - Image now published to `gleidsonlm/gitlab-ci-android` on Docker Hub
+- **Project Independence** - Complete separation from original fork with standalone branding
+- **Automated CI/CD** - GitHub Actions workflow for automated Docker Hub publishing
+- **Professional Distribution** - Easy access for developer community via Docker Hub
+
+### Changed
+- **Docker Image Name** - Updated from `jangrewe/gitlab-ci-android` to `gleidsonlm/gitlab-ci-android`
+- **GitLab CI Configuration** - Updated from `dcr.faked.org/gitlab-ci/android` to `gleidsonlm/gitlab-ci-android`
+- **GitHub Actions** - Modified to publish to `gleidsonlm/gitlab-ci-android` repository
+- **Documentation** - All examples and references updated to use new Docker Hub image
+- **Test Scripts** - Updated to reference new Docker image name
+- **Version Management** - Bumped to 3.0.0 to reflect major project independence milestone
+
+### Removed
+- **Fork Dependencies** - Eliminated all references to original `jangrewe` project
+- **Legacy Registry References** - Removed outdated `dcr.faked.org` registry configurations
+
+### Migration Guide
+- Replace `jangrewe/gitlab-ci-android` with `gleidsonlm/gitlab-ci-android` in all CI configurations
+- Replace `dcr.faked.org/gitlab-ci/android` with `gleidsonlm/gitlab-ci-android` in GitLab CI files
+- Pull new image: `docker pull gleidsonlm/gitlab-ci-android:latest`
+
 ## [2.3.0] - Phase 4: Gradle and Kotlin Build Optimization
 
 ### Added

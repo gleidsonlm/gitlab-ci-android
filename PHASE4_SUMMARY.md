@@ -62,7 +62,7 @@ Successfully implemented comprehensive Gradle and Kotlin build optimization for 
 
 ### Basic Kotlin Project
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 script:
 - gradle assembleDebug --build-cache --parallel
 ```
@@ -83,7 +83,7 @@ script:
 ```
 
 ## Network Considerations
-- **Production**: Use pre-built Docker image `jangrewe/gitlab-ci-android:latest`
+- **Production**: Use pre-built Docker image `gleidsonlm/gitlab-ci-android:latest`
 - **Development**: Build in unrestricted network environments
 - **Testing**: Gradle functionality validated independently of Android SDK
 

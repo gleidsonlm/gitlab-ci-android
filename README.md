@@ -29,7 +29,7 @@ This Docker image has been enhanced in Phase 4 with comprehensive Gradle and Kot
 Build a Kotlin Android project with optimized performance:
 
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 stages:
 - build
@@ -65,7 +65,7 @@ build_kotlin:
 Optimize builds for large multi-module Kotlin projects:
 
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 variables:
   GRADLE_OPTS: "-Xmx6g -Xms2g -XX:MaxMetaspaceSize=1g -XX:+UseG1GC"
@@ -95,7 +95,7 @@ build_multi_module:
 Build Kotlin Multiplatform projects with Android targets:
 
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 build_multiplatform:
   stage: build
@@ -293,7 +293,7 @@ gradle assembleDebug
 
 **Solutions for Production Use**:
 - Build the image in environments with full internet access
-- Use the pre-built image from Docker Hub: `docker pull jangrewe/gitlab-ci-android:latest`
+- Use the pre-built image from Docker Hub: `docker pull gleidsonlm/gitlab-ci-android:latest`
 - Configure corporate proxy settings if available
 - Use offline SDK installation methods for air-gapped environments
 
@@ -369,7 +369,7 @@ This Docker image has been extended in Phase 3 with comprehensive Android NDK su
 Build Android project with native C/C++ components:
 
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 stages:
 - build
@@ -400,7 +400,7 @@ Use different NDK versions for compatibility testing:
 
 ```yaml
 .build_native_template: &build_native_template
-  image: jangrewe/gitlab-ci-android
+  image: gleidsonlm/gitlab-ci-android
   before_script:
   - export GRADLE_USER_HOME=$(pwd)/.gradle
   - chmod +x ./gradlew
@@ -429,7 +429,7 @@ build_ndk_previous:
 Build standalone CMake projects for Android:
 
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 stages:
 - build
@@ -459,7 +459,7 @@ build_cmake:
 Support for traditional ndk-build projects:
 
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 build_ndk_build:
   stage: build
@@ -634,7 +634,7 @@ This Docker image contains the Android SDK and most common packages necessary fo
 To build your Android project targeting the latest API level:
 
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 stages:
 - build
@@ -663,7 +663,7 @@ Build and test across multiple Android API levels:
 
 ```yaml
 .build_template: &build_template
-  image: jangrewe/gitlab-ci-android
+  image: gleidsonlm/gitlab-ci-android
   before_script:
   - export GRADLE_USER_HOME=$(pwd)/.gradle
   - chmod +x ./gradlew
@@ -695,7 +695,7 @@ build_api32:
 A `.gitlab-ci.yml` with caching of your project's dependencies would look like this:
 
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 stages:
 - build
@@ -720,9 +720,17 @@ build:
 
 ## Version Information
 
-Current version: **2.3.0** (see [VERSION](VERSION) file)
+Current version: **3.0.0** (see [VERSION](VERSION) file)
 
 ### Changelog
+
+#### v3.0.0 - Phase 6: Docker Registry Publishing & Project Independence
+- **Docker Hub Publishing**: Image now available as `gleidsonlm/gitlab-ci-android` on Docker Hub
+- **Project Independence**: Complete separation from original fork with standalone branding
+- **Automated CI/CD**: GitHub Actions workflow for automated Docker Hub publishing
+- **Professional Distribution**: Easy access for developer community via Docker Hub
+- **Updated Documentation**: All examples and references updated to use new Docker Hub image
+- **Migration Guide**: Comprehensive guide for updating existing CI configurations
 
 #### v2.3.0 - Phase 4: Gradle and Kotlin Build Optimization
 - **Gradle 9.0.0 Integration**: Latest stable Gradle version installed globally for optimal performance
