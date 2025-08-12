@@ -104,3 +104,73 @@ RUN echo "#!/bin/bash" > /usr/local/bin/ndk-env \
 # - /sdk/ndk/latest -> NDK 27.3.13750724 (latest stable)
 # - /sdk/ndk/previous -> NDK 26.3.11579264 (previous stable)
 # =============================================================================
+
+# =============================================================================
+# GRADLE AND KOTLIN BUILD OPTIMIZATION - Phase 4
+# =============================================================================
+
+# Install Gradle 9.0.0 (latest stable) for global availability
+ENV GRADLE_VERSION="9.0.0"
+ENV GRADLE_HOME="/opt/gradle"
+ENV PATH="$PATH:${GRADLE_HOME}/bin"
+
+RUN wget --no-verbose --output-document=/gradle.zip \
+      https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
+ && mkdir -p ${GRADLE_HOME} \
+ && unzip /gradle.zip -d /opt \
+ && mv /opt/gradle-${GRADLE_VERSION} ${GRADLE_HOME} \
+ && rm -v /gradle.zip
+
+# Configure Gradle and Kotlin optimization environment variables
+ENV GRADLE_USER_HOME="/root/.gradle"
+ENV GRADLE_OPTS="-Xmx4g -Xms2g -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:+UseStringDeduplication -Dfile.encoding=UTF-8"
+ENV KOTLIN_DAEMON_JVM_OPTIONS="-Xmx2g -Xms512m"
+
+# Create optimized gradle.properties for Kotlin builds
+RUN mkdir -p ${GRADLE_USER_HOME} && \
+    echo "# Gradle Build Performance Optimization for Kotlin" > ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "org.gradle.daemon=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "org.gradle.parallel=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "org.gradle.configureondemand=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "org.gradle.caching=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "org.gradle.workers.max=4" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "# Android Build Optimization" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "android.useAndroidX=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "android.enableJetifier=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "android.enableR8.fullMode=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "android.bundle.enableUncompressedNativeLibs=false" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "# Kotlin Compilation Optimization" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "kotlin.incremental=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "kotlin.incremental.android=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "kotlin.incremental.java=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "kotlin.caching.enabled=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "kotlin.parallel.tasks.in.project=true" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "# JVM Memory Settings" >> ${GRADLE_USER_HOME}/gradle.properties && \
+    echo "org.gradle.jvmargs=-Xmx4g -Xms2g -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:+UseStringDeduplication -Dfile.encoding=UTF-8" >> ${GRADLE_USER_HOME}/gradle.properties
+
+# =============================================================================
+# GRADLE AND KOTLIN INTEGRATION SUMMARY
+# =============================================================================
+# Installed Components:
+# - Gradle 9.0.0 (Latest Stable) - Global installation for all projects
+# - Optimized gradle.properties with performance settings
+# - Kotlin build optimization configurations
+# - Android build performance enhancements
+#
+# Environment Variables:
+# - GRADLE_HOME: Points to Gradle installation directory
+# - GRADLE_USER_HOME: Points to global Gradle user directory
+# - GRADLE_OPTS: JVM optimization arguments for Gradle
+# - KOTLIN_DAEMON_JVM_OPTIONS: JVM optimization for Kotlin daemon
+# - PATH: Includes Gradle binaries for global access
+#
+# Performance Features:
+# - Build cache enabled for faster subsequent builds
+# - Parallel execution for multi-module projects
+# - Optimized JVM settings for Kotlin compilation
+# - Android build optimizations (R8, native libs, etc.)
+# - Incremental compilation for Kotlin and Java
+# =============================================================================
