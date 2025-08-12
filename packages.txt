@@ -29,3 +29,55 @@ extras;google;google_play_services
 # Constraint Layout Support - Modern layout system
 # Note: This specific version maintains compatibility with legacy projects
 extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2
+
+# =============================================================================
+# ANDROID NDK (NATIVE DEVELOPMENT KIT) - Phase 3 Integration
+# =============================================================================
+# The Android NDK enables C/C++ native development for Android applications
+# Multiple NDK versions are installed for maximum compatibility across projects
+
+# NDK 27d - Latest LTS (Long Term Support) Version
+# - Stable and recommended for new projects
+# - Full LLVM/Clang toolchain with latest optimizations
+# - Support for modern C++20 features and Android API 34+
+# - Enhanced debugging and profiling capabilities
+ndk;27.3.13750724
+
+# NDK 26c - Previous Stable Version
+# - Maintained for compatibility with existing projects
+# - Supports Android API 32+ 
+# - Legacy project compatibility and gradual migration support
+# - Required for some third-party libraries not yet updated to NDK 27
+ndk;26.3.11579264
+
+# CMake - Cross-platform build system for native projects
+# - Latest LTS version for Android NDK integration
+# - Required for building C/C++ code in Android projects
+# - Supports both static and shared library generation
+# - Integration with Android Gradle Plugin and Android Studio
+cmake;3.22.1
+
+# Native Development Tools and Components
+# - LLDB: Advanced debugger for native code debugging
+# - Native platform tools for cross-compilation
+# - Support for ARM64, ARM32, x86_64, and x86 architectures
+
+# =============================================================================
+# NDK USAGE NOTES
+# =============================================================================
+# Environment Variables Set:
+# - ANDROID_NDK_ROOT: Points to latest NDK installation
+# - ANDROID_NDK_HOME: Legacy compatibility variable
+# - NDK paths added to system PATH for global access
+#
+# Supported Architectures:
+# - arm64-v8a (64-bit ARM - recommended for modern devices)
+# - armeabi-v7a (32-bit ARM - legacy device support)
+# - x86_64 (64-bit Intel - emulator and specialized devices)
+# - x86 (32-bit Intel - legacy emulator support)
+#
+# Build System Integration:
+# - Compatible with CMake, ndk-build, and Bazel
+# - Android Gradle Plugin automatic NDK detection
+# - Support for both standalone and integrated builds
+# =============================================================================

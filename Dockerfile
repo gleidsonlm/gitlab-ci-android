@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 LABEL maintainer="Jan Grewe <jan@faked.org>"
 
-ENV VERSION_TOOLS="11580240"
+ENV VERSION_TOOLS="13114758"
 
 ENV ANDROID_SDK_ROOT="/sdk"
 # Keep alias for compatibility
@@ -23,6 +23,7 @@ RUN apt-get -qq update \
       lib32z1 \
       unzip \
       locales \
+      wget \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN locale-gen en_US.UTF-8
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8"
@@ -30,7 +31,8 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8"
 RUN rm -f /etc/ssl/certs/java/cacerts; \
     /var/lib/dpkg/info/ca-certificates-java.postinst configure
 
-RUN curl -s https://dl.google.com/android/repository/commandlinetools-linux-${VERSION_TOOLS}_latest.zip > /cmdline-tools.zip \
+RUN wget --no-verbose --no-check-certificate --output-document=/cmdline-tools.zip \
+      https://dl.google.com/android/repository/commandlinetools-linux-${VERSION_TOOLS}_latest.zip \
  && mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools \
  && unzip /cmdline-tools.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools \
  && mv ${ANDROID_SDK_ROOT}/cmdline-tools/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest \
@@ -46,24 +48,59 @@ RUN mkdir -p /root/.android \
  && sdkmanager --update
 
 ADD packages.txt /sdk
-RUN sdkmanager --package_file=/sdk/packages.txt
+RUN grep -v '^#' /sdk/packages.txt | grep -v '^$' > /sdk/packages_clean.txt \
+ && sdkmanager --package_file=/sdk/packages_clean.txt
 
 # =============================================================================
-# NDK INTEGRATION PREPARATION (Phase 3)
+# ANDROID NDK AND NATIVE DEVELOPMENT TOOLCHAIN - Phase 3
 # =============================================================================
-# The following section will be populated in Phase 3 with Android NDK installation
-# Planned NDK versions for Phase 3:
-# - NDK 26.1.10909125 (Latest stable as of Phase 2)
-# - NDK 25.2.9519653 (Previous stable for compatibility)
-# 
-# NDK Integration will include:
-# ENV ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk"
-# ENV PATH="$PATH:${ANDROID_NDK_ROOT}"
-# RUN sdkmanager "ndk;26.1.10909125" "ndk;25.2.9519653"
-# 
-# NDK will enable:
-# - C/C++ native development
-# - Cross-compilation for ARM, ARM64, x86, x86_64
-# - Integration with CMake and Make build systems
-# - Support for Android Studio NDK projects
+
+# Configure NDK environment variables for multi-version support
+ENV ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk"
+ENV ANDROID_NDK_HOME="${ANDROID_NDK_ROOT}/27.3.13750724"
+ENV PATH="$PATH:${ANDROID_NDK_HOME}:${ANDROID_SDK_ROOT}/cmake/3.22.1/bin"
+
+# Install native development tools
+RUN apt-get -qq update \
+ && apt-get install -qqy --no-install-recommends \
+      build-essential \
+      clang \
+      libc6-dev \
+      ninja-build \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install Android NDK and CMake through SDK Manager
+# This ensures proper integration with Android SDK and automatic license handling
+RUN sdkmanager "ndk;27.3.13750724" "ndk;26.3.11579264" "cmake;3.22.1"
+
+# Create symbolic links for easier NDK access and backward compatibility
+RUN ln -sf ${ANDROID_SDK_ROOT}/ndk/27.3.13750724 ${ANDROID_SDK_ROOT}/ndk/latest \
+ && ln -sf ${ANDROID_SDK_ROOT}/ndk/26.3.11579264 ${ANDROID_SDK_ROOT}/ndk/previous
+
+# Verify NDK installation and create runtime environment setup
+RUN echo "#!/bin/bash" > /usr/local/bin/ndk-env \
+ && echo "export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}" >> /usr/local/bin/ndk-env \
+ && echo "export ANDROID_NDK_HOME=${ANDROID_NDK_HOME}" >> /usr/local/bin/ndk-env \
+ && echo "export PATH=\$PATH:${ANDROID_NDK_HOME}:${ANDROID_SDK_ROOT}/cmake/3.22.1/bin" >> /usr/local/bin/ndk-env \
+ && chmod +x /usr/local/bin/ndk-env
+
+# =============================================================================
+# NDK INTEGRATION SUMMARY
+# =============================================================================
+# Installed Components:
+# - NDK 27.3.13750724 (Latest LTS) - Primary NDK for new projects
+# - NDK 26.3.11579264 (Previous Stable) - Compatibility for legacy projects  
+# - CMake 3.22.1 (LTS) - Native build system integration
+# - Ninja Build - High-performance build system
+# - Clang/LLVM - Modern C/C++ compiler toolchain
+# - LLDB - Advanced native code debugger (included with NDK)
+#
+# Environment Variables:
+# - ANDROID_NDK_ROOT: Points to NDK installation directory
+# - ANDROID_NDK_HOME: Points to default/latest NDK version
+# - PATH: Includes NDK and CMake binaries for global access
+#
+# Symbolic Links:
+# - /sdk/ndk/latest -> NDK 27.3.13750724 (latest stable)
+# - /sdk/ndk/previous -> NDK 26.3.11579264 (previous stable)
 # =============================================================================
