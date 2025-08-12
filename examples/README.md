@@ -1,4 +1,47 @@
-# Simple NDK Test Project
+# Test Projects and Examples
+
+This directory contains test projects and documentation for validating the Docker image's capabilities across different phases of development.
+
+## Phase 4: Gradle and Kotlin Build Optimization
+
+### Kotlin Android Test Project
+See [kotlin-test-project.md](kotlin-test-project.md) for a comprehensive Kotlin Android project that demonstrates:
+- Gradle 9.0.0 integration
+- Kotlin 2.1.0 compilation
+- Performance optimization features
+- Build cache and parallel execution testing
+
+### Gradle Integration Test
+Use the root-level test scripts to verify installation and functionality:
+
+#### Basic Integration Test
+```bash
+# Test Gradle installation and configuration
+docker run --rm gitlab-ci-android:latest ./test-gradle-kotlin-integration.sh
+```
+
+#### Installation Validation
+```bash
+# Validate Gradle download and installation process
+docker run --rm gitlab-ci-android:latest ./validate-gradle-installation.sh
+```
+
+#### Comprehensive Kotlin & Gradle Test
+```bash
+# Complete test with Kotlin project creation and build
+docker run --rm gitlab-ci-android:latest ./comprehensive-kotlin-gradle-test.sh
+```
+
+This comprehensive test creates a full Kotlin project and verifies:
+- Gradle 9.0.0 project initialization
+- Modern Kotlin features (data classes, sealed classes, lambdas)
+- Build performance optimizations
+- Incremental compilation
+- Build cache functionality
+
+## Phase 3: Android NDK Support
+
+### Simple NDK Test Project
 
 This directory contains a minimal Android NDK project for testing the Docker image's native build capabilities.
 
