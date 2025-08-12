@@ -1,10 +1,219 @@
 # gitlab-ci-android
 
+## Phase 3: Android NDK Support and Native Development
+
+This Docker image has been extended in Phase 3 with comprehensive Android NDK support and native build toolchain:
+
+### Native Development Kit (NDK) Integration
+- **NDK 27.3.13750724** (Latest LTS) - Primary NDK for new projects with modern C++20 support
+- **NDK 26.3.11579264** (Previous Stable) - Compatibility for legacy projects and gradual migration
+- **Multi-NDK Support** - Both versions available simultaneously with environment variable switching
+- **Cross-compilation Support** - ARM64, ARM32, x86_64, and x86 target architectures
+
+### Native Build Toolchain
+- **CMake 3.22.1** (LTS) - Modern cross-platform build system with Android integration
+- **Ninja Build** - High-performance build system for faster incremental builds
+- **Clang/LLVM** - Latest compiler toolchain with enhanced optimization and debugging
+- **LLDB Debugger** - Advanced native code debugging capabilities (included with NDK)
+- **Build-essential** - Complete GCC/G++ development environment
+
+### NDK Environment Configuration
+- **ANDROID_NDK_ROOT**: `/sdk/ndk` - NDK installation directory
+- **ANDROID_NDK_HOME**: `/sdk/ndk/27.3.13750724` - Points to latest NDK
+- **Symbolic Links**: 
+  - `/sdk/ndk/latest` → NDK 27.3.13750724
+  - `/sdk/ndk/previous` → NDK 26.3.11579264
+- **PATH Integration**: NDK and CMake binaries available globally
+
+## Native Development (NDK) Usage
+
+### Basic Native Build Example
+
+Build Android project with native C/C++ components:
+
+```yaml
+image: jangrewe/gitlab-ci-android
+
+stages:
+- build
+
+before_script:
+- export GRADLE_USER_HOME=$(pwd)/.gradle
+- export ANDROID_NDK_HOME=/sdk/ndk/latest
+- chmod +x ./gradlew
+
+cache:
+  key: ${CI_PROJECT_ID}-ndk
+  paths:
+  - .gradle/
+  - app/.cxx/
+
+build_native:
+  stage: build
+  script:
+  - ./gradlew assembleDebug
+  artifacts:
+    paths:
+    - app/build/outputs/apk/app-debug.apk
+```
+
+### Multi-NDK Version Targeting
+
+Use different NDK versions for compatibility testing:
+
+```yaml
+.build_native_template: &build_native_template
+  image: jangrewe/gitlab-ci-android
+  before_script:
+  - export GRADLE_USER_HOME=$(pwd)/.gradle
+  - chmod +x ./gradlew
+  cache:
+    key: ${CI_PROJECT_ID}-ndk-${NDK_VERSION}
+    paths:
+    - .gradle/
+    - app/.cxx/
+  script:
+  - export ANDROID_NDK_HOME=/sdk/ndk/${NDK_VERSION}
+  - ./gradlew assembleDebug
+
+build_ndk_latest:
+  <<: *build_native_template
+  variables:
+    NDK_VERSION: "27.3.13750724"
+
+build_ndk_previous:
+  <<: *build_native_template
+  variables:
+    NDK_VERSION: "26.3.11579264"
+```
+
+### CMake Native Project
+
+Build standalone CMake projects for Android:
+
+```yaml
+image: jangrewe/gitlab-ci-android
+
+stages:
+- build
+
+before_script:
+- export ANDROID_NDK_HOME=/sdk/ndk/latest
+- export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
+
+build_cmake:
+  stage: build
+  script:
+  - mkdir -p build
+  - cd build
+  - cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE
+          -DANDROID_ABI=arm64-v8a
+          -DANDROID_PLATFORM=android-21
+          -DCMAKE_BUILD_TYPE=Release
+          ..
+  - cmake --build . --parallel $(nproc)
+  artifacts:
+    paths:
+    - build/lib/
+```
+
+### NDK-Build Projects
+
+Support for traditional ndk-build projects:
+
+```yaml
+image: jangrewe/gitlab-ci-android
+
+build_ndk_build:
+  stage: build
+  before_script:
+  - export ANDROID_NDK_HOME=/sdk/ndk/latest
+  script:
+  - cd jni
+  - $ANDROID_NDK_HOME/ndk-build -j$(nproc)
+  artifacts:
+    paths:
+    - libs/
+```
+
+### Advanced NDK Configuration
+
+#### Custom NDK Version Selection
+
+```bash
+# Switch to specific NDK version
+export ANDROID_NDK_HOME=/sdk/ndk/26.3.11579264
+
+# Use latest NDK (default)
+export ANDROID_NDK_HOME=/sdk/ndk/latest
+
+# Verify NDK version
+$ANDROID_NDK_HOME/ndk-build -version
+```
+
+#### Multi-Architecture Builds
+
+```yaml
+build_multi_arch:
+  script:
+  - ./gradlew assembleDebug
+    -PANDROID_ABI="arm64-v8a,armeabi-v7a,x86_64,x86"
+```
+
+#### Debug Native Code
+
+```yaml
+debug_native:
+  script:
+  - export ANDROID_NDK_HOME=/sdk/ndk/latest
+  - # Build with debug symbols
+  - ./gradlew assembleDebug -PCMAKE_BUILD_TYPE=Debug
+  - # Use LLDB for debugging
+  - $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/lldb
+```
+
+### Troubleshooting NDK Issues
+
+#### Common NDK Problems and Solutions
+
+**Problem**: CMake cannot find Android NDK
+
+```bash
+# Solution: Ensure NDK environment variables are set
+export ANDROID_NDK_HOME=/sdk/ndk/latest
+export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
+```
+
+**Problem**: Unsupported NDK version error
+
+```bash
+# Solution: Switch to compatible NDK version
+export ANDROID_NDK_HOME=/sdk/ndk/previous  # Use NDK 26.x for older projects
+```
+
+**Problem**: Missing native libraries in APK
+
+```bash
+# Solution: Verify ABI filters in build.gradle
+android {
+    defaultConfig {
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
+        }
+    }
+}
+```
+
+**Problem**: Cross-compilation errors
+
+```bash
+# Solution: Use correct target architecture
+cmake -DANDROID_ABI=arm64-v8a  # For 64-bit ARM
+cmake -DANDROID_ABI=armeabi-v7a  # For 32-bit ARM
+cmake -DANDROID_ABI=x86_64  # For 64-bit Intel
+```
+
 ## Phase 2: Toolchain Modernization
-
-This Docker image has been further modernized in Phase 2 with comprehensive Android SDK updates:
-
-### Latest Android SDK Support
 - **Android API 34** (Android 14) - Latest stable release with cutting-edge features
 - **Android API 33** (Android 13) - Previous stable release for broad compatibility  
 - **Android API 32** (Android 12L) - Extended support for tablets and foldable devices
@@ -139,9 +348,18 @@ build:
 
 ## Version Information
 
-Current version: **2.1.0** (see [VERSION](VERSION) file)
+Current version: **2.2.0** (see [VERSION](VERSION) file)
 
 ### Changelog
+
+#### v2.2.0 - Phase 3: Android NDK Support and Native Development
+- **Android NDK Integration**: Added NDK 27.3.13750724 (Latest LTS) and NDK 26.3.11579264 (Previous Stable)
+- **Native Build Toolchain**: Integrated CMake 3.22.1, Ninja Build, Clang/LLVM, and LLDB debugger
+- **Multi-NDK Support**: Environment variables and symbolic links for seamless NDK version switching
+- **Cross-compilation Support**: ARM64, ARM32, x86_64, and x86 target architectures
+- **Enhanced Documentation**: Comprehensive NDK usage examples, troubleshooting, and advanced configuration
+- **Command Line Tools Update**: Updated to version 13114758 for improved compatibility
+- **Native Development Examples**: CMake, NDK-Build, and Gradle NDK integration examples
 
 #### v2.1.0 - Phase 2: Toolchain Modernization
 - **Android API Support**: Added support for Android API 34 (Android 14), 33, and 32
@@ -169,6 +387,20 @@ Current version: **2.1.0** (see [VERSION](VERSION) file)
 - **34.0.0**: Latest build tools with new optimizations and bug fixes
 - **33.0.2**: Stable and widely adopted version
 - **32.0.0**: Maintained for legacy project compatibility
+
+### Android NDK Components
+- **NDK 27.3.13750724** (Latest LTS): Primary NDK with modern C++20 support and Android API 34+ compatibility
+- **NDK 26.3.11579264** (Previous Stable): Legacy compatibility for existing projects and gradual migration
+- **CMake 3.22.1** (LTS): Cross-platform build system with Android Gradle Plugin integration
+- **Ninja Build**: High-performance build system for faster incremental native builds
+- **Clang/LLVM**: Latest compiler toolchain with enhanced optimization and debugging capabilities
+- **LLDB**: Advanced native code debugger included with NDK installation
+
+### Target Architectures
+- **arm64-v8a**: 64-bit ARM (recommended for modern devices)
+- **armeabi-v7a**: 32-bit ARM (legacy device support)
+- **x86_64**: 64-bit Intel (emulator and specialized devices)
+- **x86**: 32-bit Intel (legacy emulator support)
 
 ### Additional Components
 - **Google APIs 24**: Backward compatibility support
