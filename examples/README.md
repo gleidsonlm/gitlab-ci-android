@@ -2,6 +2,94 @@
 
 This directory contains test projects and documentation for validating the Docker image's capabilities across different phases of development.
 
+## Phase 5: Testing & Validation
+
+### Comprehensive Android Project Test
+The most complete test available, validating all tools working together:
+
+```bash
+# Run comprehensive integration test
+docker run --rm jangrewe/gitlab-ci-android:latest ./test-android-project-comprehensive.sh
+```
+
+This test creates a complete Android project with:
+- **Kotlin + NDK Integration**: Modern Android app with native C++ components
+- **Multi-API Support**: Tests building for Android APIs 32, 33, and 34
+- **Gradle Optimization**: Build cache, parallel execution, and performance features
+- **Real-world Scenarios**: Demonstrates typical Android development workflows
+
+### Sample CI/CD Build Script
+Demonstrates best practices for Android CI/CD workflows:
+
+```bash
+# In your Android project directory
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  jangrewe/gitlab-ci-android:latest \
+  ./sample-ci-build.sh
+```
+
+This script demonstrates:
+- Environment setup and validation
+- Dependency resolution and caching
+- Code quality checks and linting
+- Multi-variant builds (debug/release)
+- Testing execution and reporting
+- Performance metrics and CI/CD integration examples
+
+### Testing for Junior Developers
+
+#### Quick Environment Check
+```bash
+# Verify all tools are installed and configured
+docker run --rm jangrewe/gitlab-ci-android:latest bash -c "
+echo 'Java:' && java -version 2>&1 | head -1 &&
+echo 'Gradle:' && gradle --version | grep Gradle &&
+echo 'Android SDK:' && ls /sdk/platforms/ | head -3 &&
+echo 'NDK:' && ls /sdk/ndk/ | head -2
+"
+```
+
+#### Step-by-Step Project Test
+```bash
+# Create and build a test Android project
+mkdir test-project && cd test-project
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  jangrewe/gitlab-ci-android:latest \
+  bash -c "
+  gradle init --type android-application --dsl kotlin --quiet &&
+  chmod +x gradlew &&
+  ./gradlew assembleDebug --build-cache --parallel
+  "
+```
+
+### Troubleshooting Guide
+
+#### Common Issues and Solutions
+
+**Issue**: "SDK not found" errors
+```bash
+# Solution: Verify SDK environment
+docker run --rm jangrewe/gitlab-ci-android:latest env | grep ANDROID
+```
+
+**Issue**: Build runs out of memory
+```bash
+# Solution: Increase memory allocation
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  -e GRADLE_OPTS="-Xmx6g -Xms3g" \
+  jangrewe/gitlab-ci-android:latest \
+  ./gradlew assembleDebug
+```
+
+**Issue**: NDK build failures
+```bash
+# Solution: Set correct NDK environment
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  -e ANDROID_NDK_HOME=/sdk/ndk/latest \
+  jangrewe/gitlab-ci-android:latest \
+  ./gradlew assembleDebug
+```
+
 ## Phase 4: Gradle and Kotlin Build Optimization
 
 ### Kotlin Android Test Project

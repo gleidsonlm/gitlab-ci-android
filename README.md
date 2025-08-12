@@ -1,5 +1,230 @@
 # gitlab-ci-android
 
+## Phase 5: Testing & Validation
+
+This Docker image has been enhanced in Phase 5 with comprehensive testing and validation procedures to ensure all tools work correctly together:
+
+### Testing Framework
+- **Comprehensive Android Project Test** - Full integration test validating SDK, NDK, Gradle, and Kotlin
+- **Sample CI/CD Build Script** - Demonstrative workflow for typical Android development
+- **Junior Developer Friendly** - Step-by-step procedures with clear troubleshooting guidance
+- **Reproducible Tests** - Consistent validation across different environments
+- **Performance Validation** - Build cache, parallel execution, and optimization verification
+
+### Validation Procedures
+- **Environment Verification** - Automated validation of all installed tools and configurations
+- **Multi-API Testing** - Support for Android API levels 32, 33, and 34
+- **Native Development Testing** - NDK integration with modern C++17 features
+- **Build Performance Testing** - Incremental builds and cache effectiveness validation
+
+## Testing & Validation
+
+### Quick Validation Test
+
+Run the comprehensive integration test to validate all tools work together:
+
+```bash
+# Pull the latest image
+docker pull jangrewe/gitlab-ci-android:latest
+
+# Run comprehensive Android project test
+docker run --rm jangrewe/gitlab-ci-android:latest ./test-android-project-comprehensive.sh
+```
+
+This test validates:
+- ✅ Android SDK configuration and API level support
+- ✅ NDK installation and native library compilation
+- ✅ Gradle 9.0.0 optimization features
+- ✅ Kotlin 2.1.0 compilation with modern features
+- ✅ Build cache and parallel execution
+- ✅ APK generation and artifact validation
+
+### Sample CI/CD Workflow Test
+
+Test a complete CI/CD workflow with your project:
+
+```bash
+# In your Android project directory
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  jangrewe/gitlab-ci-android:latest \
+  ./sample-ci-build.sh
+```
+
+This demonstrates:
+- 📋 Environment setup and validation
+- 📦 Dependency resolution and caching
+- 🔍 Code quality checks and linting
+- 🏗️ Multi-variant builds (debug/release)
+- 🧪 Testing execution and reporting
+- 📊 Performance metrics and optimization
+
+### Step-by-Step Testing for Junior Developers
+
+#### 1. Environment Validation
+```bash
+# Test Java installation
+docker run --rm jangrewe/gitlab-ci-android:latest java -version
+
+# Test Android SDK
+docker run --rm jangrewe/gitlab-ci-android:latest ls -la /sdk/platforms/
+
+# Test Gradle installation
+docker run --rm jangrewe/gitlab-ci-android:latest gradle --version
+
+# Test NDK installation
+docker run --rm jangrewe/gitlab-ci-android:latest ls -la /sdk/ndk/
+```
+
+#### 2. Basic Android Project Test
+```bash
+# Create a simple test project
+mkdir android-test && cd android-test
+
+# Run the basic integration test
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  jangrewe/gitlab-ci-android:latest \
+  bash -c "
+  gradle init --type android-application --dsl kotlin --quiet &&
+  gradle assembleDebug --build-cache
+  "
+```
+
+#### 3. Testing Your Existing Project
+```bash
+# In your Android project directory
+# Test debug build
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  jangrewe/gitlab-ci-android:latest \
+  ./gradlew assembleDebug --build-cache --parallel
+
+# Test with NDK (if your project uses native code)
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  -e ANDROID_NDK_HOME=/sdk/ndk/latest \
+  jangrewe/gitlab-ci-android:latest \
+  ./gradlew assembleDebug --build-cache --parallel
+```
+
+### Troubleshooting Common Issues
+
+#### Issue: Build fails with "SDK not found"
+```bash
+# Solution: Verify SDK environment variables
+docker run --rm jangrewe/gitlab-ci-android:latest env | grep ANDROID
+
+# Expected output:
+# ANDROID_SDK_ROOT=/sdk
+# ANDROID_HOME=/sdk
+# ANDROID_NDK_HOME=/sdk/ndk/latest
+```
+
+#### Issue: Gradle daemon errors
+```bash
+# Solution: Use recommended Gradle options
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  -e GRADLE_OPTS="-Xmx4g -Xms2g -XX:MaxMetaspaceSize=1g" \
+  jangrewe/gitlab-ci-android:latest \
+  ./gradlew clean assembleDebug
+```
+
+#### Issue: NDK compilation fails
+```bash
+# Solution: Verify NDK version and set correct environment
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  -e ANDROID_NDK_HOME=/sdk/ndk/latest \
+  -e CMAKE_TOOLCHAIN_FILE=/sdk/ndk/latest/build/cmake/android.toolchain.cmake \
+  jangrewe/gitlab-ci-android:latest \
+  ./gradlew assembleDebug
+```
+
+#### Issue: Out of memory during build
+```bash
+# Solution: Increase memory allocation
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  -e GRADLE_OPTS="-Xmx6g -Xms3g -XX:MaxMetaspaceSize=2g" \
+  jangrewe/gitlab-ci-android:latest \
+  ./gradlew assembleDebug --parallel --max-workers=2
+```
+
+#### Issue: Network connectivity during Docker build
+**Note**: In restricted network environments, Docker builds may fail due to network limitations.
+
+**Solutions**:
+- Use the pre-built image: `docker pull jangrewe/gitlab-ci-android:latest`
+- Build in environments with full internet access
+- Configure proxy settings if available
+- Use the testing scripts to validate functionality without rebuilding
+
+### Available Test Scripts
+
+#### Comprehensive Tests
+```bash
+# Full Android project integration test
+./test-android-project-comprehensive.sh
+
+# Sample CI/CD workflow demonstration
+./sample-ci-build.sh
+```
+
+#### Component-Specific Tests
+```bash
+# Gradle installation validation
+./validate-gradle-installation.sh
+
+# Gradle and Kotlin integration test
+./test-gradle-kotlin-integration.sh
+
+# NDK integration test
+./test-ndk-integration.sh
+
+# Comprehensive Kotlin and Gradle test
+./comprehensive-kotlin-gradle-test.sh
+```
+
+### Performance Optimization Testing
+
+#### Build Cache Effectiveness
+```bash
+# Test build cache performance
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  jangrewe/gitlab-ci-android:latest \
+  bash -c "
+  time ./gradlew assembleDebug --build-cache &&
+  ./gradlew clean &&
+  time ./gradlew assembleDebug --build-cache
+  "
+```
+
+#### Parallel Build Performance
+```bash
+# Test parallel execution
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  -e GRADLE_OPTS='-Xmx4g' \
+  jangrewe/gitlab-ci-android:latest \
+  ./gradlew assembleDebug --parallel --max-workers=4 --build-cache
+```
+
+### CI/CD Integration Validation
+
+#### GitLab CI Test
+```yaml
+# Test .gitlab-ci.yml configuration
+validate_gitlab_ci:
+  image: jangrewe/gitlab-ci-android
+  script:
+    - ./test-android-project-comprehensive.sh
+    - ./sample-ci-build.sh
+```
+
+#### GitHub Actions Test
+```yaml
+# Test GitHub Actions workflow
+- name: Validate Android Environment
+  run: ./test-android-project-comprehensive.sh
+  
+- name: Test CI/CD Workflow
+  run: ./sample-ci-build.sh
+```
+
 ## Phase 4: Gradle and Kotlin Build Optimization
 
 This Docker image has been enhanced in Phase 4 with comprehensive Gradle and Kotlin build optimization:
@@ -720,9 +945,19 @@ build:
 
 ## Version Information
 
-Current version: **2.3.0** (see [VERSION](VERSION) file)
+Current version: **2.4.0** (see [VERSION](VERSION) file)
 
 ### Changelog
+
+#### v2.4.0 - Phase 5: Testing & Validation
+- **Comprehensive Testing Framework**: Complete integration test validating SDK, NDK, Gradle, and Kotlin
+- **Sample CI/CD Build Script**: Demonstrative script showing typical Android development workflows
+- **Junior Developer Documentation**: Step-by-step testing procedures and troubleshooting guides
+- **Reproducible Test Framework**: Clear, actionable test instructions for all skill levels
+- **Multi-API Testing**: Validation across Android API levels 32, 33, and 34
+- **Performance Validation**: Build cache, parallel execution, and optimization verification
+- **Native Development Testing**: NDK integration testing with modern C++17 features
+- **Enhanced Documentation**: Complete testing and validation procedures in README
 
 #### v2.3.0 - Phase 4: Gradle and Kotlin Build Optimization
 - **Gradle 9.0.0 Integration**: Latest stable Gradle version installed globally for optimal performance
