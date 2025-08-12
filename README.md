@@ -19,9 +19,11 @@ This Docker image has been modernized with the following updates:
 
 This Docker image contains the Android SDK and most common packages necessary for building Android apps in a CI tool like GitLab CI. Make sure your CI environment's caching works as expected, this greatly improves the build time, especially if you use multiple build jobs.
 
+## Usage Example
+
 A `.gitlab-ci.yml` with caching of your project's dependencies would look like this:
 
-```
+```yaml
 image: jangrewe/gitlab-ci-android
 
 stages:
@@ -44,3 +46,16 @@ build:
     paths:
     - app/build/outputs/apk/app-debug.apk
 ```
+
+## Version Information
+
+Current version: **2.0.0** (see [VERSION](VERSION) file)
+
+### Changelog
+
+#### v2.0.0 - Phase 1 Modernization
+- Updated base image from Ubuntu 20.04 to Ubuntu 22.04 LTS
+- Upgraded Java from OpenJDK 11 to OpenJDK 17
+- Updated Android SDK command-line tools for Java 17 compatibility
+- Improved Dockerfile following modern best practices
+- Enhanced documentation and added semantic versioning

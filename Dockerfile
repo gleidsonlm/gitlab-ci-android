@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 LABEL maintainer="Jan Grewe <jan@faked.org>"
 
-ENV VERSION_TOOLS="9477386"
+ENV VERSION_TOOLS="11076708"
 
 ENV ANDROID_SDK_ROOT="/sdk"
 # Keep alias for compatibility
