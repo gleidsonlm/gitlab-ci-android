@@ -197,18 +197,18 @@ org.gradle.caching=true
 ```bash
 # Build the Kotlin test project
 docker run --rm -v $(pwd)/kotlin-test-project:/workspace -w /workspace \
-  jangrewe/gitlab-ci-android:latest \
+  gleidsonlm/gitlab-ci-android:latest \
   gradle assembleDebug
 
 # Test with Gradle wrapper (if gradlew exists)
 docker run --rm -v $(pwd)/kotlin-test-project:/workspace -w /workspace \
-  jangrewe/gitlab-ci-android:latest \
+  gleidsonlm/gitlab-ci-android:latest \
   ./gradlew assembleDebug
 
 # Test build performance with cache
 docker run --rm -v $(pwd)/kotlin-test-project:/workspace -w /workspace \
   -e GRADLE_USER_HOME=/workspace/.gradle \
-  jangrewe/gitlab-ci-android:latest \
+  gleidsonlm/gitlab-ci-android:latest \
   gradle assembleDebug --build-cache --parallel
 ```
 
@@ -217,12 +217,12 @@ docker run --rm -v $(pwd)/kotlin-test-project:/workspace -w /workspace \
 ```bash
 # Time the build process
 docker run --rm -v $(pwd)/kotlin-test-project:/workspace -w /workspace \
-  jangrewe/gitlab-ci-android:latest \
+  gleidsonlm/gitlab-ci-android:latest \
   bash -c "time gradle assembleDebug"
 
 # Test incremental build
 docker run --rm -v $(pwd)/kotlin-test-project:/workspace -w /workspace \
-  jangrewe/gitlab-ci-android:latest \
+  gleidsonlm/gitlab-ci-android:latest \
   bash -c "gradle assembleDebug && touch app/src/main/kotlin/com/example/kotlintest/MainActivity.kt && time gradle assembleDebug"
 ```
 

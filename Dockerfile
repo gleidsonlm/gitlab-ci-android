@@ -1,5 +1,5 @@
 FROM ubuntu:22.04
-LABEL maintainer="Jan Grewe <jan@faked.org>"
+LABEL maintainer="Gleidson Lima <gleidsonlm@example.com>"
 
 ENV VERSION_TOOLS="13114758"
 

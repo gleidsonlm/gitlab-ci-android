@@ -1,6 +1,6 @@
 # gitlab-ci-android Docker Image
 
-This repository builds a Docker image (`jangrewe/gitlab-ci-android`) containing the Android SDK and tools necessary for building Android applications in CI environments like GitLab CI and GitHub Actions.
+This repository builds a Docker image (`gleidsonlm/gitlab-ci-android`) containing the Android SDK and tools necessary for building Android applications in CI environments like GitLab CI and GitHub Actions.
 
 Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
 
@@ -43,14 +43,14 @@ docker run --rm gitlab-ci-android env | grep ANDROID
 ### Using the Published Image
 **Pull the pre-built image:**
 ```bash
-docker pull jangrewe/gitlab-ci-android:latest
+docker pull gleidsonlm/gitlab-ci-android:latest
 ```
 
 **Test Android app builds:**
 ```bash
 # In your Android project directory with gradlew
 docker run --rm -v $(pwd):/workspace -w /workspace \
-  jangrewe/gitlab-ci-android:latest \
+  gleidsonlm/gitlab-ci-android:latest \
   ./gradlew assembleDebug
 ```
 - NEVER CANCEL: Initial Gradle builds take 5-10 minutes as dependencies download. Set timeout to 20+ minutes.
@@ -61,7 +61,7 @@ docker run --rm -v $(pwd):/workspace -w /workspace \
 
 **GitLab CI (.gitlab-ci.yml):**
 ```yaml
-image: jangrewe/gitlab-ci-android
+image: gleidsonlm/gitlab-ci-android
 
 stages:
 - build
@@ -91,7 +91,7 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: jangrewe/gitlab-ci-android:latest
+    container: gleidsonlm/gitlab-ci-android:latest
     steps:
     - uses: actions/checkout@v3
     - name: Setup Gradle cache
