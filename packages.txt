@@ -1,7 +1,31 @@
-add-ons;addon-google_apis-google-24
-build-tools;33.0.0
-extras;android;m2repository
-extras;google;m2repository
-extras;google;google_play_services
-extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2
+# Android SDK Platforms - Multiple recent API levels for broad compatibility
+# API 34 (Android 14) - Latest stable release
+platforms;android-34
+# API 33 (Android 13) - Previous stable release
 platforms;android-33
+# API 32 (Android 12L) - Extended support for tablets and foldables
+platforms;android-32
+
+# Android SDK Build Tools - Latest versions for each supported API level
+# Build tools for API 34 - Latest features and optimizations
+build-tools;34.0.0
+# Build tools for API 33 - Stable and widely used
+build-tools;33.0.2
+# Build tools for API 32 - Legacy support
+build-tools;32.0.0
+
+# Google Add-ons and APIs
+# Google APIs for API 24 - Maintains backward compatibility
+add-ons;addon-google_apis-google-24
+
+# Android Support Libraries and Repositories
+# Android Support Repository - Required for support libraries
+extras;android;m2repository
+# Google Repository - Required for Google Play Services and Firebase
+extras;google;m2repository
+# Google Play Services - Essential for most Android apps
+extras;google;google_play_services
+
+# Constraint Layout Support - Modern layout system
+# Note: This specific version maintains compatibility with legacy projects
+extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2
