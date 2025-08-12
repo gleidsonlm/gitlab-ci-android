@@ -174,6 +174,41 @@ debug_native:
 
 ### Troubleshooting NDK Issues
 
+### Troubleshooting NDK Issues
+
+#### Current Known Issue - Network Connectivity
+
+**Note**: In some restricted network environments (such as certain CI/CD sandboxes), Docker builds may fail to download packages from Google's repositories due to SSL certificate or network connectivity issues. This manifests as:
+
+```
+Warning: Failed to download any source lists!
+Warning: IO exception while downloading manifest
+```
+
+**Solution**: Build the image in an environment with full internet access, such as:
+- Local development machine with unrestricted network access
+- CI/CD environments with proxy configuration
+- Cloud build services with proper SSL certificate handling
+
+**Test the Implementation**:
+```bash
+# Build the image locally or in unrestricted environment
+docker build -t gitlab-ci-android-ndk .
+
+# Run comprehensive NDK integration test
+./test-ndk-integration.sh
+
+# Or verify components manually:
+# Verify NDK installation
+docker run --rm gitlab-ci-android-ndk ndk-build --version
+
+# Test NDK environment variables
+docker run --rm gitlab-ci-android-ndk env | grep ANDROID_NDK
+
+# Verify CMake integration
+docker run --rm gitlab-ci-android-ndk cmake --version
+```
+
 #### Common NDK Problems and Solutions
 
 **Problem**: CMake cannot find Android NDK
