@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 LABEL maintainer="Jan Grewe <jan@faked.org>"
 
-ENV VERSION_TOOLS="11076708"
+ENV VERSION_TOOLS="11580240"
 
 ENV ANDROID_SDK_ROOT="/sdk"
 # Keep alias for compatibility
@@ -47,3 +47,23 @@ RUN mkdir -p /root/.android \
 
 ADD packages.txt /sdk
 RUN sdkmanager --package_file=/sdk/packages.txt
+
+# =============================================================================
+# NDK INTEGRATION PREPARATION (Phase 3)
+# =============================================================================
+# The following section will be populated in Phase 3 with Android NDK installation
+# Planned NDK versions for Phase 3:
+# - NDK 26.1.10909125 (Latest stable as of Phase 2)
+# - NDK 25.2.9519653 (Previous stable for compatibility)
+# 
+# NDK Integration will include:
+# ENV ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk"
+# ENV PATH="$PATH:${ANDROID_NDK_ROOT}"
+# RUN sdkmanager "ndk;26.1.10909125" "ndk;25.2.9519653"
+# 
+# NDK will enable:
+# - C/C++ native development
+# - Cross-compilation for ARM, ARM64, x86, x86_64
+# - Integration with CMake and Make build systems
+# - Support for Android Studio NDK projects
+# =============================================================================
