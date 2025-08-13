@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-LABEL version="1.0.1" \
+LABEL version="1.0.2" \
       description="Android CI/CD Docker image with pre-configured SDK, build tools, and GitLab optimization" \
       maintainer="gleidsonlm"
 
@@ -102,14 +102,6 @@ RUN apt-get -qq update \
 # This ensures proper integration with Android SDK and automatic license handling
 RUN sdkmanager "ndk;27.3.13750724" "ndk;26.3.11579264" "cmake;3.22.1" || echo "Warning: NDK packages failed to install due to network issues"
 
-# Create symbolic links for easier NDK access and backward compatibility
-RUN if [ -d ${ANDROID_SDK_ROOT}/ndk/27.3.13750724 ]; then \
-      ln -sf ${ANDROID_SDK_ROOT}/ndk/27.3.13750724 ${ANDROID_SDK_ROOT}/ndk/latest; \
-    fi && \
-    if [ -d ${ANDROID_SDK_ROOT}/ndk/26.3.11579264 ]; then \
-      ln -sf ${ANDROID_SDK_ROOT}/ndk/26.3.11579264 ${ANDROID_SDK_ROOT}/ndk/previous; \
-    fi
-
 # Verify NDK installation and create runtime environment setup
 RUN echo "#!/bin/bash" > /usr/local/bin/ndk-env \
  && echo "export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}" >> /usr/local/bin/ndk-env \
@@ -117,6 +109,10 @@ RUN echo "#!/bin/bash" > /usr/local/bin/ndk-env \
  && echo "export PATH=\$PATH:${ANDROID_NDK_HOME}:${ANDROID_SDK_ROOT}/cmake/3.22.1/bin" >> /usr/local/bin/ndk-env \
  && chmod +x /usr/local/bin/ndk-env \
  && echo "NDK environment setup script created (run 'source /usr/local/bin/ndk-env' if NDK was installed)"
+
+# Validate SDK Manager detects no duplicate NDK packages
+RUN echo "Validating NDK installation without warnings..." \
+ && sdkmanager --list 2>&1 | grep -i "warning.*ndk" || echo "✓ No NDK warnings detected"
 
 # =============================================================================
 # NDK INTEGRATION SUMMARY
@@ -131,12 +127,13 @@ RUN echo "#!/bin/bash" > /usr/local/bin/ndk-env \
 #
 # Environment Variables:
 # - ANDROID_NDK_ROOT: Points to NDK installation directory
-# - ANDROID_NDK_HOME: Points to default/latest NDK version
+# - ANDROID_NDK_HOME: Points to default/latest NDK version (27.3.13750724)
 # - PATH: Includes NDK and CMake binaries for global access
 #
-# Symbolic Links:
-# - /sdk/ndk/latest -> NDK 27.3.13750724 (latest stable)
-# - /sdk/ndk/previous -> NDK 26.3.11579264 (previous stable)
+# NDK Locations:
+# - /sdk/ndk/27.3.13750724 (latest stable - canonical location)
+# - /sdk/ndk/26.3.11579264 (previous stable - canonical location)
+# Note: No symbolic links are created to avoid SDK Manager warnings about duplicate packages
 # =============================================================================
 
 # =============================================================================
