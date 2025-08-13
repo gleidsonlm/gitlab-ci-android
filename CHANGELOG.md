@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-01-XX - NDK Warnings Resolution
+
+### Fixed
+- **NDK Duplicate Package Warnings** - Resolved Android SDK Manager warnings about duplicate NDK package IDs
+- **Inconsistent Location Warnings** - Eliminated warnings about NDK packages found in inconsistent locations
+- **SDK Manager Detection** - Fixed duplicate detection of NDK versions 27.3.13750724 and 26.3.11579264
+
+### Changed
+- **NDK Installation Structure** - Removed symbolic links `/sdk/ndk/latest` and `/sdk/ndk/previous` that were causing duplicate package detection
+- **Canonical NDK Paths** - NDK installations now exist only in their canonical locations (`/sdk/ndk/27.3.13750724` and `/sdk/ndk/26.3.11579264`)
+- **Documentation** - Updated Dockerfile comments to reflect removal of symbolic links
+
+### Added
+- **NDK Validation Check** - Added SDK Manager validation during Docker build to detect and prevent NDK warnings
+- **Clean Build Verification** - Ensure builds complete without package location warnings
+
+### Migration Guide
+- No changes required for existing CI configurations
+- NDK access should use canonical paths instead of symbolic links:
+  - Use `/sdk/ndk/27.3.13750724` instead of `/sdk/ndk/latest`
+  - Use `/sdk/ndk/26.3.11579264` instead of `/sdk/ndk/previous`
+- Environment variable `ANDROID_NDK_HOME` continues to point to NDK 27.3.13750724
+
 ## [3.1.0] - 2025-08-12 - Docker Build Fix and Resilience Improvements
 
 ### Fixed
