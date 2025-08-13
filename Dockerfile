@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-LABEL version="3.1.1" \
+LABEL version="1.0.1" \
       description="Android CI/CD Docker image with pre-configured SDK, build tools, and GitLab optimization" \
       maintainer="gleidsonlm"
 
