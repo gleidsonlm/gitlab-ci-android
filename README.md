@@ -2,14 +2,6 @@
 
 This Docker image contains the Android SDK and most common packages necessary for building Android apps in a CI tool like GitLab CI.
 
-## NDK Best Practices
-
-**Important:** This image uses canonical NDK paths to avoid SDK Manager warnings:
-- NDK 27.3.13750724: `/sdk/ndk/27.3.13750724` (latest stable)
-- NDK 26.3.11579264: `/sdk/ndk/26.3.11579264` (previous stable)
-
-**No symbolic links** are created (e.g., `/sdk/ndk/latest`) to prevent Android SDK Manager from detecting duplicate package IDs. When referencing NDK in your builds, use the full canonical paths.
-
 ## Usage Examples
 
 ### Targeting Latest Android API (34)
