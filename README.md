@@ -102,6 +102,7 @@ This image includes all essential Android app signing and validation tools for s
 ### Available Tools
 
 #### 1. keytool
+
 - **Purpose**: Java keystore management and certificate operations
 - **Location**: Included with OpenJDK 17, globally accessible
 - **Usage**: Create, manage, and verify keystores and certificates
@@ -118,6 +119,7 @@ keytool -list -v -keystore my-release-key.keystore -alias mykey
 ```
 
 #### 2. jarsigner
+
 - **Purpose**: Sign JAR files, APKs, and AABs using keystores
 - **Location**: Included with OpenJDK 17, globally accessible
 - **Usage**: Legacy signing method supporting APK Signature Scheme v1
@@ -131,6 +133,7 @@ jarsigner -verify -verbose -certs app-release-signed.apk
 ```
 
 #### 3. apksigner
+
 - **Purpose**: Modern Android APK signing tool with advanced signature schemes
 - **Location**: Android SDK Build Tools (34.0.0, 33.0.2, 32.0.0)
 - **Usage**: Recommended for APK signing with v2/v3 signature scheme support
@@ -150,6 +153,7 @@ apksigner verify --print-certs app-release.apk
 ```
 
 #### 4. zipalign
+
 - **Purpose**: Optimize APK file alignment for better runtime performance
 - **Location**: Android SDK Build Tools (34.0.0, 33.0.2, 32.0.0)
 - **Usage**: Align APK data for optimal memory usage (run before signing)
