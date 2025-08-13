@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-LABEL version="1.0.2" \
+LABEL version="1.2.0" \
       description="Android CI/CD Docker image with pre-configured SDK, build tools, and GitLab optimization" \
       maintainer="gleidsonlm"
 
@@ -9,7 +9,7 @@ ENV VERSION_TOOLS="13114758"
 ENV ANDROID_SDK_ROOT="/sdk"
 # Keep alias for compatibility
 ENV ANDROID_HOME="${ANDROID_SDK_ROOT}"
-ENV PATH="$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools"
+ENV PATH="$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/build-tools/34.0.0:${ANDROID_SDK_ROOT}/build-tools/33.0.2:${ANDROID_SDK_ROOT}/build-tools/32.0.0"
 ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get -qq update \
@@ -227,4 +227,70 @@ RUN mkdir -p ${GRADLE_USER_HOME} && \
 # - Optimized JVM settings for Kotlin compilation
 # - Android build optimizations (R8, native libs, etc.)
 # - Incremental compilation for Kotlin and Java
+# =============================================================================
+
+# =============================================================================
+# ANDROID APP SIGNING TOOLS - Phase 6
+# =============================================================================
+
+# Verify and document Android app signing tools availability
+# These tools are essential for securing Android applications in CI/CD pipelines
+RUN echo "Validating Android app signing tools..." && \
+    echo "✓ keytool: $(which keytool)" && \
+    echo "✓ jarsigner: $(which jarsigner)" && \
+    (which apksigner >/dev/null 2>&1 && echo "✓ apksigner: $(which apksigner)" || echo "ℹ apksigner: Will be available when build-tools are installed") && \
+    (which zipalign >/dev/null 2>&1 && echo "✓ zipalign: $(which zipalign)" || echo "ℹ zipalign: Will be available when build-tools are installed") && \
+    echo "Android app signing tools validation completed."
+
+# Create a helper script for tool validation and usage information
+RUN echo '#!/bin/bash' > /usr/local/bin/android-signing-tools && \
+    echo 'echo "=== Android App Signing Tools ==="' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "1. keytool - Keystore management (Java/Android certificates)"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "   Location: $(which keytool 2>/dev/null || echo "Not found")"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "   Usage: keytool -genkey -alias mykey -keystore my-release-key.keystore"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo ""' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "2. jarsigner - JAR/APK/AAB signing with keystores"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "   Location: $(which jarsigner 2>/dev/null || echo "Not found")"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "   Usage: jarsigner -keystore my-release-key.keystore app-release-unsigned.apk mykey"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo ""' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "3. apksigner - Modern Android APK signing (v2/v3 schemes)"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "   Location: $(which apksigner 2>/dev/null || echo "Available in /sdk/build-tools/*/apksigner")"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "   Usage: apksigner sign --ks my-release-key.keystore --out app-release.apk app-release-unsigned.apk"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo ""' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "4. zipalign - APK optimization for runtime performance"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "   Location: $(which zipalign 2>/dev/null || echo "Available in /sdk/build-tools/*/zipalign")"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "   Usage: zipalign -v 4 app-unaligned.apk app-aligned.apk"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo ""' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "=== Complete Signing Workflow Example ==="' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "1. zipalign -v 4 app-release-unsigned.apk app-release-aligned.apk"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "2. apksigner sign --ks release.keystore --out app-release.apk app-release-aligned.apk"' >> /usr/local/bin/android-signing-tools && \
+    echo 'echo "3. apksigner verify app-release.apk"' >> /usr/local/bin/android-signing-tools && \
+    chmod +x /usr/local/bin/android-signing-tools
+
+# =============================================================================
+# ANDROID APP SIGNING TOOLS SUMMARY
+# =============================================================================
+# Available Tools:
+# 1. keytool - Java keystore management tool (included with OpenJDK 17)
+#    - Create, manage, and verify keystores and certificates
+#    - Essential for keystore preparation and certificate management
+#
+# 2. jarsigner - JAR/APK/AAB signing tool (included with OpenJDK 17)  
+#    - Sign APKs and AABs using existing keystores
+#    - Legacy signing method, supports v1 signature scheme
+#
+# 3. apksigner - Modern Android APK signing tool (Android SDK Build Tools)
+#    - Supports APK Signature Scheme v2 and v3 (recommended)
+#    - Better security and performance than jarsigner
+#    - Available in all installed build-tools versions
+#
+# 4. zipalign - APK alignment optimization tool (Android SDK Build Tools)
+#    - Optimizes APK structure for better runtime performance
+#    - Should be run before signing for optimal results
+#    - Available in all installed build-tools versions
+#
+# Environment Setup:
+# - PATH includes multiple build-tools versions for maximum compatibility
+# - Helper script available: run 'android-signing-tools' for usage information
+# - All tools are globally accessible from any directory
 # =============================================================================

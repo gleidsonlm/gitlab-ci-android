@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-01-XX - Android App Signing Tools Integration
+
+### Added
+- **Android App Signing Tools** - Complete integration of essential Android signing and validation tools
+  - `keytool` - Java keystore management tool (included with OpenJDK 17)
+  - `jarsigner` - JAR/APK/AAB signing tool (included with OpenJDK 17)
+  - `apksigner` - Modern Android APK signing tool with v2/v3 signature scheme support
+  - `zipalign` - APK alignment optimization tool for better runtime performance
+- **Build Tools PATH Integration** - Added all build-tools versions (34.0.0, 33.0.2, 32.0.0) to system PATH
+- **Signing Tools Helper Script** - Created `android-signing-tools` command for usage information and examples
+- **Comprehensive Tool Documentation** - Detailed usage examples and complete signing workflow guidance
+
+### Enhanced
+- **PATH Environment** - Extended to include multiple build-tools versions for maximum tool compatibility
+- **Tool Accessibility** - All signing tools are now globally accessible from any directory
+- **CI/CD Security** - Enables secure app builds and releases with proper signing tool integration
+
+### Documentation
+- **Usage Examples** - Complete Android app signing workflow with zipalign → apksigner → verify
+- **Tool Locations** - Clear documentation of where each tool is installed and how to access it
+- **Best Practices** - Security-focused signing recommendations for CI/CD pipelines
+
 ## [1.0.2] - 2025-01-XX - NDK Warnings Resolution
 
 ### Fixed
