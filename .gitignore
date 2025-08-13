@@ -1,0 +1,18 @@
+# Docker build artifacts
+*.tar
+*.gz
+
+# Temporary test files
+/tmp/
+test-docker-*
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
