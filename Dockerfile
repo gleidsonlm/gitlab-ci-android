@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-LABEL version="3.1.0" \
+LABEL version="3.1.1" \
       description="Android CI/CD Docker image with pre-configured SDK, build tools, and GitLab optimization" \
       maintainer="gleidsonlm"
 
@@ -36,8 +36,32 @@ RUN rm -f /etc/ssl/certs/java/cacerts; \
 # Update CA certificates for proper SSL/TLS validation
 RUN update-ca-certificates
 
-RUN curl --silent --show-error --output /cmdline-tools.zip \
-      https://dl.google.com/android/repository/commandlinetools-linux-${VERSION_TOOLS}_latest.zip \
+# Download Android command line tools with retry logic and validation
+RUN for i in 1 2 3; do \
+      echo "Attempt $i: Downloading Android command line tools..." && \
+      (curl --fail --location --retry 3 --retry-delay 2 --retry-connrefused \
+           --show-error --output /cmdline-tools.zip \
+           https://dl.google.com/android/repository/commandlinetools-linux-${VERSION_TOOLS}_latest.zip \
+      || { \
+           echo "HTTPS download failed, trying insecure download (NOT RECOMMENDED for production)..." && \
+           curl --fail --location --retry 3 --retry-delay 2 --retry-connrefused \
+                --insecure --show-error --output /cmdline-tools.zip \
+                https://dl.google.com/android/repository/commandlinetools-linux-${VERSION_TOOLS}_latest.zip; \
+      }) \
+      && echo "Download completed. Validating zip file..." \
+      && unzip -t /cmdline-tools.zip > /dev/null 2>&1 \
+      && echo "Zip file validation successful." \
+      && break || { \
+           echo "Download attempt $i failed. Cleaning up..." && \
+           rm -f /cmdline-tools.zip && \
+           [ $i -eq 3 ] && { \
+             echo "ERROR: Failed to download Android command line tools after 3 attempts." && \
+             echo "This may be due to network issues or SSL certificate problems." && \
+             echo "Please check your network connection and try again." && \
+             exit 1; \
+           } || sleep 5; \
+      }; \
+    done \
  && mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools \
  && unzip /cmdline-tools.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools \
  && mv ${ANDROID_SDK_ROOT}/cmdline-tools/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest \
@@ -124,8 +148,32 @@ ENV GRADLE_VERSION="9.0.0"
 ENV GRADLE_HOME="/opt/gradle"
 ENV PATH="$PATH:${GRADLE_HOME}/bin"
 
-RUN curl --silent --show-error --output /gradle.zip \
-      https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
+# Download and install Gradle with retry logic and validation
+RUN for i in 1 2 3; do \
+      echo "Attempt $i: Downloading Gradle ${GRADLE_VERSION}..." && \
+      (curl --fail --location --retry 3 --retry-delay 2 --retry-connrefused \
+           --show-error --output /gradle.zip \
+           https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
+      || { \
+           echo "HTTPS download failed, trying insecure download (NOT RECOMMENDED for production)..." && \
+           curl --fail --location --retry 3 --retry-delay 2 --retry-connrefused \
+                --insecure --show-error --output /gradle.zip \
+                https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip; \
+      }) \
+      && echo "Download completed. Validating zip file..." \
+      && unzip -t /gradle.zip > /dev/null 2>&1 \
+      && echo "Zip file validation successful." \
+      && break || { \
+           echo "Download attempt $i failed. Cleaning up..." && \
+           rm -f /gradle.zip && \
+           [ $i -eq 3 ] && { \
+             echo "ERROR: Failed to download Gradle ${GRADLE_VERSION} after 3 attempts." && \
+             echo "This may be due to network issues, SSL certificate problems, or invalid Gradle version." && \
+             echo "Please check your network connection and verify the Gradle version is available." && \
+             exit 1; \
+           } || sleep 5; \
+      }; \
+    done \
  && unzip /gradle.zip -d /opt \
  && mv /opt/gradle-${GRADLE_VERSION} ${GRADLE_HOME} \
  && rm -v /gradle.zip
